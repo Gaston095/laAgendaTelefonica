@@ -13,13 +13,25 @@ const App = () => {
       name : newName
     }
 
-    setPersons(persons.concat(personOBject))
+    const includesRepeatName = persons.map(person => person.name).includes(newName)
+
+    if (includesRepeatName) {
+      alert(`${newName} is already added to phonebook`)
+    }else {
+      setPersons(persons.concat(personOBject))
+    }
+
     setNewName('')
   }
 
   const handlePersonChange = (event) => {
     setNewName(event.target.value)
   }
+
+/*   const includesDuplicatesNames = () => {
+    const arrayNames = persons.map(person => person.name)
+    (arrayNames.includes(newName))
+  } */
 
   return (
     <div>
