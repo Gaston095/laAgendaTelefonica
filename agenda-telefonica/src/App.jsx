@@ -1,5 +1,6 @@
 import { useEffect, useState } from 'react'
 import axios from 'axios'
+import personService from './services/persons'
 import Filter from './Filter'
 import PersonForm from './PersonForm'
 import Persons from './Persons'
@@ -23,9 +24,9 @@ const App = () => {
     if (includesRepeatName) {
       alert(`${newName} is already added to phonebook`)
     }else {
-      axios.post('http://localhost:3001/persons', personOBject)
-      .then(response => {
-        setPersons(persons.concat(response.data))
+      personService.create(personOBject)
+      .then(returnedPerson => {
+        setPersons(persons.concat(returnedPerson))
       })
     }
 
@@ -50,11 +51,10 @@ const App = () => {
   : persons.filter(person => person.name.toLowerCase() === filterName.toLowerCase())
 
   useEffect(()=> {
-    axios
-      .get('http://localhost:3001/persons')
-      .then(response => {
+    personService.getAll()
+      .then(initialPersons => {
         console.log('promise fulfilled')
-        setPersons(response.data)
+        setPersons(initialPersons)
       })
   }, [])
 
