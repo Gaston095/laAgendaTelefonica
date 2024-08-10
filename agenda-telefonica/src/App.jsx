@@ -4,12 +4,16 @@ import personService from "./services/persons";
 import Filter from "./Filter";
 import PersonForm from "./PersonForm";
 import Persons from "./Persons";
+import Notification from "./Notification";
+import "./index.css";
 
 const App = () => {
   const [persons, setPersons] = useState([]);
   const [newName, setNewName] = useState("");
   const [newNumber, setNewNumber] = useState("");
   const [filterName, setFilterName] = useState("");
+  const [errorMessage, setErrorMessage] = useState(null);
+  const [isError, setIsError] = useState(false)
 
   const addPerson = (event) => {
     event.preventDefault();
@@ -22,16 +26,30 @@ const App = () => {
     const includesRepeatName = persons
       .map((person) => person.name.toLowerCase())
       .includes(newName.toLowerCase());
-    
-    const findRepeatPerson = persons.find(p => p.name.toLowerCase() === newName.toLocaleLowerCase())
+
+    const findRepeatPerson = persons.find(
+      (p) => p.name.toLowerCase() === newName.toLocaleLowerCase()
+    );
 
     if (includesRepeatName) {
-      window.confirm(`${newName} is already added to phonebook, replace the old number with a new one`)
-      ? updatePersons(findRepeatPerson.id)
-      : console.log("no confirmo")
+      window.confirm(
+        `${newName} is already added to phonebook, replace the old number with a new one`
+      )
+        ? (updatePersons(findRepeatPerson.id),
+          setIsError(false),
+          setErrorMessage(`Updated ${findRepeatPerson.name}`),
+          setTimeout(() => {
+            setErrorMessage(null);
+          }, 4000))
+        : console.log("no confirmo");
     } else {
       personService.create(personOBject).then((returnedPerson) => {
         setPersons(persons.concat(returnedPerson));
+        setIsError(false);
+        setErrorMessage(`Added ${returnedPerson.name}`);
+        setTimeout(() => {
+          setErrorMessage(null);
+        }, 4000);
       });
     }
 
@@ -39,14 +57,13 @@ const App = () => {
     setNewNumber("");
   };
 
-  const updatePersons = id => {
-    const person = persons.find(p => p.id === id)
-    const newObjectPerson = { ...person, number : newNumber}
+  const updatePersons = (id) => {
+    const person = persons.find((p) => p.id === id);
+    const newObjectPerson = { ...person, number: newNumber };
     personService.update(id, newObjectPerson).then((returnedPerson) => {
-      setPersons(persons.map(p => p.id !== id? p : returnedPerson))
-    })
-  }
-
+      setPersons(persons.map((p) => (p.id !== id ? p : returnedPerson)));
+    });
+  };
 
   const handlePersonChange = (event) => {
     setNewName(event.target.value);
@@ -66,9 +83,18 @@ const App = () => {
         .remove(id)
         .then((returnedPerson) => {
           console.log(returnedPerson);
+          setIsError(false)
+          setErrorMessage(`Deleted ${returnedPerson.name}`)
+        setTimeout(()=> {
+          setErrorMessage(null)
+        },4000)
         })
         .catch((error) => {
-          console.log(`the person ${name} was already deleted from server`);
+          setIsError(true)
+          setErrorMessage(`the person ${name} was already deleted from server`);
+          setTimeout(() => {
+            setErrorMessage(null);
+          }, 4000);
         });
 
       setPersons(persons.filter((p) => p.id !== id));
@@ -97,6 +123,7 @@ const App = () => {
         handleFilterNameChange={handleFilterNameChange}
       />
       <h3>add a new</h3>
+      <Notification message={errorMessage} isError={isError}/>
       <PersonForm
         newName={newName}
         handlePersonChange={handlePersonChange}
