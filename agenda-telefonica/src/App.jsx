@@ -62,6 +62,13 @@ const App = () => {
     const newObjectPerson = { ...person, number: newNumber };
     personService.update(id, newObjectPerson).then((returnedPerson) => {
       setPersons(persons.map((p) => (p.id !== id ? p : returnedPerson)));
+    })
+    .catch((error) => {
+      setIsError(true)
+      setErrorMessage(`the person ${person.name} was already deleted from server`);
+      setTimeout(() => {
+        setErrorMessage(null);
+      }, 4000);
     });
   };
 
