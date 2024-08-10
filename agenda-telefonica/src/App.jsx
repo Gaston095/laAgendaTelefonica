@@ -22,9 +22,13 @@ const App = () => {
     const includesRepeatName = persons
       .map((person) => person.name.toLowerCase())
       .includes(newName.toLowerCase());
+    
+    const findRepeatPerson = persons.find(p => p.name.toLowerCase() === newName.toLocaleLowerCase())
 
     if (includesRepeatName) {
-      alert(`${newName} is already added to phonebook`);
+      window.confirm(`${newName} is already added to phonebook, replace the old number with a new one`)
+      ? updatePersons(findRepeatPerson.id)
+      : console.log("no confirmo")
     } else {
       personService.create(personOBject).then((returnedPerson) => {
         setPersons(persons.concat(returnedPerson));
@@ -34,6 +38,15 @@ const App = () => {
     setNewName("");
     setNewNumber("");
   };
+
+  const updatePersons = id => {
+    const person = persons.find(p => p.id === id)
+    const newObjectPerson = { ...person, number : newNumber}
+    personService.update(id, newObjectPerson).then((returnedPerson) => {
+      setPersons(persons.map(p => p.id !== id? p : returnedPerson))
+    })
+  }
+
 
   const handlePersonChange = (event) => {
     setNewName(event.target.value);
