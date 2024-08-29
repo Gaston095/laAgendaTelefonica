@@ -50,7 +50,14 @@ const App = () => {
         setTimeout(() => {
           setErrorMessage(null);
         }, 4000);
-      });
+      })
+      .catch(error => {
+        setIsError(true);
+        setErrorMessage(`Must be at least 3 characters long`);
+        setTimeout(() => {
+          setErrorMessage(null);
+        }, 4000);
+      })
     }
 
     setNewName("");
