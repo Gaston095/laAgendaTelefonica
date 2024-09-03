@@ -53,7 +53,7 @@ const App = () => {
       })
       .catch(error => {
         setIsError(true);
-        setErrorMessage(`Must be at least 3 characters long`);
+        setErrorMessage(error.response.data.error);
         setTimeout(() => {
           setErrorMessage(null);
         }, 4000);
